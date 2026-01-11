@@ -1,43 +1,55 @@
-from rest_framework import generics
+from rest_framework.generics import (
+    ListAPIView, CreateAPIView,
+    RetrieveUpdateDestroyAPIView
+)
+from django.db.models import Count, Avg
+
 from .models import Category, Product, Review
-from .serializers import (CategorySerializer, ProductSerializer, ReviewSerializer, ProductReviewsSerializer)
-from django.db.models import Avg, Count
+from .serializers import (
+    CategorySerializer,
+    ProductSerializer,
+    ReviewSerializer,
+    ProductWithReviewsSerializer
+)
 
-class CategoryListAPIView(generics.ListAPIView):
-    queryset = Category.objects.all()
+
+class CategoryListCreateView(ListAPIView, CreateAPIView):
+    queryset = Category.objects.annotate(products_count=Count("products"))
     serializer_class = CategorySerializer
-    def get_queryset(self):
-        return Category.objects.annotate(
-            products_count=Count('products'))
 
-class CategoryDetailAPIView(generics.RetrieveAPIView):
-    queryset = Category.objects.all()
+
+class CategoryDetailView(RetrieveUpdateDestroyAPIView):
+    queryset = Category.objects.annotate(products_count=Count("products"))
     serializer_class = CategorySerializer
-    lookup_field = 'id'
+    lookup_field = "id"
 
 
-class ProductListAPIView(generics.ListAPIView):
+class ProductListCreateView(ListAPIView, CreateAPIView):
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
 
-class ProductDetailAPIView(generics.RetrieveAPIView):
+
+class ProductDetailView(RetrieveUpdateDestroyAPIView):
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
-    lookup_field = 'id'
+    lookup_field = "id"
 
 
-class ReviewListAPIView(generics.ListAPIView):
+
+
+class ReviewListCreateView(ListAPIView, CreateAPIView):
     queryset = Review.objects.all()
     serializer_class = ReviewSerializer
 
-class ReviewDetailAPIView(generics.RetrieveAPIView):
+
+class ReviewDetailView(RetrieveUpdateDestroyAPIView):
     queryset = Review.objects.all()
     serializer_class = ReviewSerializer
-    lookup_field = 'id'
-    
-class ProductReviewsAPIView(generics.ListAPIView):
-    serializer_class = ProductReviewsSerializer
-    def get_queryset(self):
-        return Product.objects.annotate(
-            rating=Avg('reviews__stars')
-        ).prefetch_related('reviews')
+    lookup_field = "id"
+
+
+
+
+class ProductsWithReviewsView(ListAPIView):
+    queryset = Product.objects.annotate(rating=Avg("reviews__stars"))
+    serializer_class = ProductWithReviewsSerializer
