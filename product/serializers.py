@@ -10,16 +10,16 @@ class CategorySerializer(serializers.ModelSerializer):
         fields = ["id", "name", "products_count"]
 
 
-class ReviewSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Review
-        fields = ["id", "text", "stars", "product"]
-
-
 class ProductSerializer(serializers.ModelSerializer):
     class Meta:
         model = Product
         fields = ["id", "title", "description", "price", "category"]
+
+
+class ReviewSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Review
+        fields = ["id", "text", "stars", "product"]
 
 
 class ProductWithReviewsSerializer(serializers.ModelSerializer):
@@ -29,3 +29,20 @@ class ProductWithReviewsSerializer(serializers.ModelSerializer):
     class Meta:
         model = Product
         fields = ["id", "title", "description", "price", "category", "reviews", "rating"]
+
+
+class CategoryValidateSerializer(serializers.Serializer):
+    name = serializers.CharField()
+
+
+class ProductValidateSerializer(serializers.Serializer):
+    title = serializers.CharField()
+    description = serializers.CharField()
+    price = serializers.FloatField()
+    category_id = serializers.IntegerField()
+
+
+class ReviewValidateSerializer(serializers.Serializer):
+    text = serializers.CharField()
+    stars = serializers.IntegerField()
+    product_id = serializers.IntegerField()
